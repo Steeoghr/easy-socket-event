@@ -1,1 +1,1 @@
-# socket-event
+# Socket comunication by event
