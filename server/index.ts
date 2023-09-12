@@ -1,53 +1,51 @@
-import * as net from 'net';
+import {Socket, Server, createServer} from 'net';
 import { ISocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter } from '../models';
 
-// creazione di una classe SocketServer che permetta la gestione di sottoeventi nell'evento "data"
 export class SocketServer extends SocketActor implements ISocketServer {
-    private server: net.Server;
-    public clientsConnected: net.Socket[] = [];
+    private server: Server;
+    public clientsConnected: Socket[] = [];
 
-    public clientConnected: (socket: net.Socket) => void = () => {};
-    public onClose: () => void = () => {};
-    public onError: (err: Error) => void = () => {};
-    public onEmit: <T>(event: SocketServerEvent<T>, socket: net.Socket) => void = <T>() => {};
+    public clientConnected: (socket: Socket) => void = () => {};
+    public onClose: (socket: Socket) => void = () => {};
+    public onError: (err: Error, socket: Socket) => void = () => {};
+    public onEmit: <T>(event: SocketServerEvent<T>, socket: Socket) => void = <T>() => {};
 
     constructor() {
         super();
-        this.server = net.createServer();
-        this.server.on('connection', (socket: net.Socket) => {
+        this.server = createServer();
+        this.server.on('connection', (socket: Socket) => {
             console.log('Client connected:', socket.remoteAddress, socket.remotePort);
             this.clientsConnected.push(socket);
             this.clientConnected(socket);
 
             socket.on('data', (message: string) => this.handleEvent(socket, message));
             socket.on('close', () => this.handleClose(socket));
-            socket.on('error', (err) => this.handleError(err));
+            socket.on('error', (err) => this.handleError(err, socket));
         });
     }
 
-    private handleEvent<T>(socket: net.Socket, message: string) {
+    private handleEvent<T>(socket: Socket, message: string) {
         const messageEvent: SocketServerEvent<T> = JSON.parse(message);
         const registeredEvent = this.events[messageEvent.name];
 
         if (!registeredEvent) {
-            console.error(`Event ${messageEvent.name} not registered`);
-            return;
+            throw new Error(`Event ${messageEvent.name} not registered`);
         }
 
         registeredEvent.handler(messageEvent.data, socket);
     };
 
-    private handleClose(socket: net.Socket) {
+    private handleClose(socket: Socket) {
         console.log('Client disconnected:', socket.remoteAddress, socket.remotePort);
-        this.onClose();
+        this.onClose(socket);
     };
 
-    private handleError(err: Error) {
+    private handleError(err: Error, socket: Socket) {
         console.error('Socket error:', err.message);
-        this.onError(err);
+        this.onError(err, socket);
     };
 
-    protected emit<T>(eventName: string, data: T, socket: net.Socket) {
+    protected emit<T>(eventName: string, data: T, socket: Socket) {
         const event = {
             name: eventName,
             data
@@ -61,7 +59,7 @@ export class SocketServer extends SocketActor implements ISocketServer {
     public Emitter<S extends string>(...params: S[]): SocketServerEmitter<S> {
         const self = this;
         return <SocketServerEmitter<S>> {
-            emit: <T>(eventName: S, socket: net.Socket, data?: T) => {
+            emit: <T>(eventName: S, socket: Socket, data?: T) => {
                 self.emit(eventName, data, socket);
             }
         };
@@ -69,7 +67,7 @@ export class SocketServer extends SocketActor implements ISocketServer {
 
     public EventEmitter<T>(eventName: string): SocketServerEventEmitter<T> {
         return <SocketServerEventEmitter<T>> {
-            emit: <T>(socket: net.Socket, data?: T) => {
+            emit: <T>(socket: Socket, data?: T) => {
                 this.emit(eventName, data, socket);
             }
         };
@@ -78,14 +76,6 @@ export class SocketServer extends SocketActor implements ISocketServer {
     public Listen(host: string, port: number) {
         this.server.listen(port, host, () => {
           console.log(`Server listening on ${host}:${port}`);
-        });
-    }
-
-    public broadcast(message: string, sender: net.Socket) {
-        this.clientsConnected.forEach(user => {
-            if (user !== sender) {
-                this.emit("boradcast", message, user);
-            }
         });
     }
 }
