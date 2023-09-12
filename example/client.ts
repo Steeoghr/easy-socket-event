@@ -3,13 +3,15 @@ import * as net from "net";
 
 const client = new SocketClient();
 
+const {emit:exampleEmit} = client.EventEmitter<string>("example");
+
 client.connected = () => {
     console.log("Client connected");
-    client.emit<string>("example", "Example event emit");
+    exampleEmit("Example event emit")
 };
 
-client.registerEvent<string>("example-response", (data: string, sender: net.Socket) => {
+client.Event<string>("example-response", (data: string, sender: net.Socket) => {
     console.log("\"example-response\" client event handler >>>", data);
 });
 
-client.connect("localhost", 3001);
+client.Connect("localhost", 3001);

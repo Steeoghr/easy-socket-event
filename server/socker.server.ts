@@ -1,5 +1,5 @@
 import * as net from 'net';
-import { ISocketServer, SocketActor, SocketServerEvent, SocketServerEventHandler } from '../models';
+import { ISocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter } from '../models';
 
 // creazione di una classe SocketServer che permetta la gestione di sottoeventi nell'evento "data"
 export class SocketServer extends SocketActor implements ISocketServer {
@@ -47,7 +47,7 @@ export class SocketServer extends SocketActor implements ISocketServer {
         this.onError(err);
     };
 
-    public emit<T>(eventName: string, data: T, socket: net.Socket) {
+    protected emit<T>(eventName: string, data: T, socket: net.Socket) {
         const event = {
             name: eventName,
             data
@@ -58,7 +58,24 @@ export class SocketServer extends SocketActor implements ISocketServer {
         this.onEmit(event, socket);
     }
 
-    public listen(host: string, port: number) {
+    public Emitter<S extends string>(...params: S[]): SocketServerEmitter<S> {
+        const self = this;
+        return <SocketServerEmitter<S>> {
+            emit: <T>(eventName: S, socket: net.Socket, data?: T) => {
+                self.emit(eventName, data, socket);
+            }
+        };
+    }
+
+    public EventEmitter<T>(eventName: string): SocketServerEventEmitter<T> {
+        return <SocketServerEventEmitter<T>> {
+            emit: <T>(socket: net.Socket, data?: T) => {
+                this.emit(eventName, data, socket);
+            }
+        };
+    }
+
+    public Listen(host: string, port: number) {
         this.server.listen(port, host, () => {
           console.log(`Server listening on ${host}:${port}`);
         });

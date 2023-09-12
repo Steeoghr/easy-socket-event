@@ -1,5 +1,5 @@
 import * as net from 'net';
-import { ISocketClient, SocketActor, SocketServerEvent } from '../models';
+import { ISocketClient, SocketActor, SocketClientEmitter, SocketServerEvent, SocketClientEventEmitter } from '../models';
 
 export class SocketClient extends SocketActor implements ISocketClient {
     private socket: net.Socket;
@@ -14,7 +14,7 @@ export class SocketClient extends SocketActor implements ISocketClient {
         this.socket = new net.Socket();
     }
 
-    public connect(host: string, port: number) {
+    public Connect(host: string, port: number) {
         this.socket.connect(port, host, () => {
             this.connected();
         });
@@ -46,7 +46,7 @@ export class SocketClient extends SocketActor implements ISocketClient {
         this.onError(err);
     };
 
-    public emit<T>(eventName: string, data: T) {
+    protected emit<T>(eventName: string, data?: T) {
         const event = {
             name: eventName,
             data
@@ -54,5 +54,22 @@ export class SocketClient extends SocketActor implements ISocketClient {
 
         this.socket.write(JSON.stringify(event));
         this.onEmit(event);
+    }
+
+    public Emitter<S extends string>(...params: S[]): SocketClientEmitter<S> {
+        const self = this;
+        return <SocketClientEmitter<S>> {
+            emit: <T>(eventName: S, data?: T) => {
+                self.emit(eventName, data);
+            }
+        };
+    }
+
+    public EventEmitter<T>(eventName: string): SocketClientEventEmitter<T> {
+        return <SocketClientEventEmitter<T>> {
+            emit: <T>(data?: T) => {
+                this.emit(eventName, data);
+            }
+        };
     }
 }
