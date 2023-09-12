@@ -13,29 +13,62 @@ export type SocketServerEventHandler<T> = {
     handler: SocketServerEventHandlerDelegate<T>;
 };
 
-export type SockerServerEventEmitter<T> = {
-    name: string;
-    data: T;
-};
+
+// Client Emitter types
+export type SocketClientEmitterResultDelegate<S extends string> = <T>(eventName: S, data?: T) => void;
+export type SocketClientEventEmitterResultDelegate = <T>(data?: T) => void;
+
+export type SocketClientEventEmitter<T> = {
+    emit(data?: T): SocketClientEventEmitterResultDelegate;
+}
+
+export type SocketClientEmitter<S extends string> = {
+    emit<T>(eventName: S, data?: T): SocketClientEmitterResultDelegate<S>;
+}
+
+// Server Emitter types
+export type SocketServerEmitterResultDelegate<S extends string> = <T>(eventName: S, socket: net.Socket, data?: T) => void;
+export type SocketServerEventEmitterResultDelegate = <T>(socket: net.Socket, data?: T) => void;
+
+
+export type SocketServerEventEmitter<T> = {
+    emit(socket: net.Socket, data?: T): SocketServerEventEmitterResultDelegate;
+}
+
+export type SocketServerEmitter<S extends string> = {
+    emit<T>(eventName: S, data?: T): SocketServerEmitterResultDelegate<S>;
+}
+
 
 export interface ISocketActor {
-    registerEvent<T>(name: string, handler: SocketServerEventHandlerDelegate<T>): SocketServerEventHandler<T>;
+    Event<T>(name: string, handler: SocketServerEventHandlerDelegate<T>): SocketServerEventHandler<T>;
+    // defineEmit() TODO
 }
 
 export interface ISocketServer extends ISocketActor {
-    listen(host: string, port: number): void;
-    emit<T>(eventName: string, data: T, socket: net.Socket): void;
+    Listen(host: string, port: number): void;
+    Emitter<S extends string>(...params: S[]): SocketServerEmitter<S>;
+    EventEmitter<T>(eventName: string): SocketServerEventEmitter<T>;
+    clientConnected: (socket: net.Socket) => void;
+    onClose: () => void;
+    onError: (err: Error) => void;
+    onEmit: <T>(event: SocketServerEvent<T>, socket: net.Socket) => void;
 }
 
 export interface ISocketClient extends ISocketActor {
-    connect(host: string, port: number): void;
-    emit<T>(eventName: string, data: T): void;
+    Connect(host: string, port: number): void;
+    Emitter<S extends string>(...params: S[]): SocketClientEmitter<S>;
+    EventEmitter<T>(eventName: string): SocketClientEventEmitter<T>;
+    connected: () => void;
+    onClose: () => void;
+    onError: (err: Error) => void;
+    onEmit: <T>(event: SocketServerEvent<T>) => void;
 }
 
 export abstract class SocketActor implements ISocketActor {
     public events: Dictionary<SocketServerEventHandler<any>> = {};
 
-    public registerEvent<T>(name: string, handler: SocketServerEventHandlerDelegate<T>) {
+    public Event<T>(name: string, handler: SocketServerEventHandlerDelegate<T>) {
         this.events[name] = {
             name,
             handler

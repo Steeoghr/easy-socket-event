@@ -3,12 +3,14 @@ import * as net from "net";
 
 const server = new SocketServer();
 
+const {emit:exampleResponseEmit} = server.EventEmitter<string>("example-response");
+
 // Register the handler for an example event
-server.registerEvent<string>("example", (data: string, sender: net.Socket) => {  
+server.Event<string>("example", (data: string, sender: net.Socket) => {  
     console.log("\"example\" event handler >>>", data)
     
     // Return a message to sender
-    server.emit("example-response", "Server example response for: " + data, sender);
+    exampleResponseEmit(sender, "Server example response for: " + data);
 });
 
-server.listen("localhost", 3001);
+server.Listen("localhost", 3001);
