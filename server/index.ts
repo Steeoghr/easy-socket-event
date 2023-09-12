@@ -1,4 +1,4 @@
-import { NetSocket, NetServer, NetCreateServer, ISocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter } from '../models';
+import { NetSocket, NetServer, NetCreateServer, ISocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter } from '../types';
 
 export class SocketServer extends SocketActor implements ISocketServer {
     private server: NetServer;
