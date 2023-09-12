@@ -6,8 +6,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "start-server": "concurrently --kill-others \"npx tsc -w\" \"npx nodemon dist/chat-example/server.js\"",
-    "start-client": "concurrently --kill-others \"npx tsc -w\" \"npx nodemon dist/chat-example/client.js\""
+    "start-server": "concurrently --kill-others \"npx tsc -w\" \"npx nodemon dist/example/server.js\"",
+    "start-client": "concurrently --kill-others \"npx tsc -w\" \"npx nodemon dist/example/client.js\""
   },
   "dependencies": {
     "@types/inquirer": "^9.0.3",
