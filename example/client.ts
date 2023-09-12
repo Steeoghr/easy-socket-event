@@ -1,5 +1,5 @@
+import { NetSocket } from "models";
 import { SocketClient } from "../client";
-import * as net from "net";
 
 // Create a new socket client
 const client = new SocketClient();
@@ -15,7 +15,7 @@ client.connected = () => {
 };
 
 // Create a new event handler for the "example-response" event
-client.Event<string>("example-response", (data: string, sender: net.Socket) => {
+client.Event<string>("example-response", (data: string, sender: NetSocket) => {
     console.log("\"example-response\" client event handler >>>", data);
 });
 
