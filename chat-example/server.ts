@@ -7,6 +7,9 @@ import { NetUserInfo } from "./models/user";
 
 const server = new SocketServer();
 
+const {emit:connectionResponseEmit} = server.EventEmitter<ConnectionResponse>("connection-response");
+const {emit:messageEmit} = server.EventEmitter<MessageSocketEvent>("message");
+
 interface NetUser extends NetUserInfo {
     socket: net.Socket;
 }
@@ -15,7 +18,7 @@ const usersConnected: NetUser[] = [];
 
 // Register the handler for connection event
 
-server.registerEvent<ConnectionInfo>("connection", (data: ConnectionInfo, sender: net.Socket) => {  
+server.Event<ConnectionInfo>("connection", (data: ConnectionInfo, sender: net.Socket) => {  
     console.log("responseEmitter")
     const connectionMessage = data;
     const user = {
@@ -35,12 +38,12 @@ server.registerEvent<ConnectionInfo>("connection", (data: ConnectionInfo, sender
         } : null,
     };
 
-    server.emit("connection-response", response, sender);
+    connectionResponseEmit(sender, response);
 });
 
 // Register the handler for message event
 
-server.registerEvent<MessageSocketEvent>("message", (message: MessageSocketEvent, sender: net.Socket) => {
+server.Event<MessageSocketEvent>("message", (message: MessageSocketEvent, sender: net.Socket) => {
     const user = usersConnected.find(user => user.username === message.to);
     if (!user) {
         sender.write(JSON.stringify({
@@ -53,7 +56,7 @@ server.registerEvent<MessageSocketEvent>("message", (message: MessageSocketEvent
 
     console.log("Socket send message to user " + sender.remoteAddress)
 
-    server.emit("message", message, user.socket);
+    messageEmit(user.socket, message);
 });
 
-server.listen("localhost", 3001);
+server.Listen("localhost", 3001);

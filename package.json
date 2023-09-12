@@ -7,7 +7,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start-server": "concurrently --kill-others \"npx tsc -w\" \"npx nodemon dist/example/server.js\"",
-    "start-client": "concurrently --kill-others \"npx tsc -w\" \"npx nodemon dist/example/client.js\""
+    "start-client": "concurrently --kill-others \"npx tsc -w\" \"npx nodemon dist/example/client.js\"",
+    "start-chat-server": "node dist/chat-example/server.js",
+    "start-chat-client": "node dist/chat-example/client.js"
   },
   "dependencies": {
     "@types/inquirer": "^9.0.3",

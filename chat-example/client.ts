@@ -26,9 +26,12 @@ let toUser: NetUserInfo | null = null;
 
 const client = new SocketClient();
 
+const {emit:connectionEmit} = client.EventEmitter<ConnectionInfo>("connection");
+const {emit:messageEmit} = client.EventEmitter<MessageSocketEvent>("message");
+
 client.connected = () => {
     // console.log("Client connected");
-    client.emit<ConnectionInfo>("connection", {
+    connectionEmit({
         to,
         username,
         key: publicKey
@@ -99,7 +102,7 @@ const screen = blessed.screen({
         message: cryptor.execute(input),
         key: publicKey,
       } as MessageSocketEvent;
-    client.emit("message", message);
+    messageEmit(message);
   
     chatBox.content += `\n[You] >>> ${input}`;
     inputBox.clearValue();
@@ -128,7 +131,7 @@ let init = false;
 
 // export const testHandler = client.registerHandler<string>();
 
-client.registerEvent<ConnectionResponse>("connection-response", (data: ConnectionResponse, sender: net.Socket) => {
+client.Event<ConnectionResponse>("connection-response", (data: ConnectionResponse, sender: net.Socket) => {
     // console.log("connection response event handler", data)
     
     if (!data.connected) {
@@ -151,7 +154,7 @@ client.registerEvent<ConnectionResponse>("connection-response", (data: Connectio
 });
 
 
-client.registerEvent("message", (message: MessageSocketEvent, sender: net.Socket) => {
+client.Event("message", (message: MessageSocketEvent, sender: net.Socket) => {
     if (!toUser) {
         toUser = { 
           username: message.from,
@@ -176,4 +179,4 @@ client.registerEvent("message", (message: MessageSocketEvent, sender: net.Socket
     screen.render();
 });
 
-client.connect("localhost", 3001);
+client.Connect("localhost", 3001);
