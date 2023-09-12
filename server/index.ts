@@ -1,19 +1,18 @@
-import {Socket, Server, createServer} from 'net';
-import { ISocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter } from '../models';
+import { NetSocket, NetServer, NetCreateServer, ISocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter } from '../models';
 
 export class SocketServer extends SocketActor implements ISocketServer {
-    private server: Server;
-    public clientsConnected: Socket[] = [];
+    private server: NetServer;
+    public clientsConnected: NetSocket[] = [];
 
-    public clientConnected: (socket: Socket) => void = () => {};
-    public onClose: (socket: Socket) => void = () => {};
-    public onError: (err: Error, socket: Socket) => void = () => {};
-    public onEmit: <T>(event: SocketServerEvent<T>, socket: Socket) => void = <T>() => {};
+    public clientConnected: (socket: NetSocket) => void = () => {};
+    public onClose: (socket: NetSocket) => void = () => {};
+    public onError: (err: Error, socket: NetSocket) => void = () => {};
+    public onEmit: <T>(event: SocketServerEvent<T>, socket: NetSocket) => void = <T>() => {};
 
     constructor() {
         super();
-        this.server = createServer();
-        this.server.on('connection', (socket: Socket) => {
+        this.server = NetCreateServer();
+        this.server.on('connection', (socket: NetSocket) => {
             console.log('Client connected:', socket.remoteAddress, socket.remotePort);
             this.clientsConnected.push(socket);
             this.clientConnected(socket);
@@ -24,7 +23,7 @@ export class SocketServer extends SocketActor implements ISocketServer {
         });
     }
 
-    private handleEvent<T>(socket: Socket, message: string) {
+    private handleEvent<T>(socket: NetSocket, message: string) {
         const messageEvent: SocketServerEvent<T> = JSON.parse(message);
         const registeredEvent = this.events[messageEvent.name];
 
@@ -35,17 +34,17 @@ export class SocketServer extends SocketActor implements ISocketServer {
         registeredEvent.handler(messageEvent.data, socket);
     };
 
-    private handleClose(socket: Socket) {
+    private handleClose(socket: NetSocket) {
         console.log('Client disconnected:', socket.remoteAddress, socket.remotePort);
         this.onClose(socket);
     };
 
-    private handleError(err: Error, socket: Socket) {
+    private handleError(err: Error, socket: NetSocket) {
         console.error('Socket error:', err.message);
         this.onError(err, socket);
     };
 
-    protected emit<T>(eventName: string, data: T, socket: Socket) {
+    protected emit<T>(eventName: string, data: T, socket: NetSocket) {
         const event = {
             name: eventName,
             data
@@ -59,7 +58,7 @@ export class SocketServer extends SocketActor implements ISocketServer {
     public Emitter<S extends string>(...params: S[]): SocketServerEmitter<S> {
         const self = this;
         return <SocketServerEmitter<S>> {
-            emit: <T>(eventName: S, socket: Socket, data?: T) => {
+            emit: <T>(eventName: S, socket: NetSocket, data?: T) => {
                 self.emit(eventName, data, socket);
             }
         };
@@ -67,7 +66,7 @@ export class SocketServer extends SocketActor implements ISocketServer {
 
     public EventEmitter<T>(eventName: string): SocketServerEventEmitter<T> {
         return <SocketServerEventEmitter<T>> {
-            emit: <T>(socket: Socket, data?: T) => {
+            emit: <T>(socket: NetSocket, data?: T) => {
                 this.emit(eventName, data, socket);
             }
         };

@@ -1,5 +1,18 @@
-import { Socket } from 'net';
+import { Server, Socket, createServer } from 'net';
 import { Dictionary } from 'utility/dictionary';
+
+// define the net socket and server types
+export class NetSocket extends Socket {
+    
+}
+export class NetServer extends Server {
+
+}
+
+// define the function to create a net server
+export function NetCreateServer(): NetServer {
+    return createServer();
+}
 
 // Define the type of the function to handle the event.
 export type SocketServerEventHandlerDelegate<T> = (data: T, sender: Socket) => void;

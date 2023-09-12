@@ -1,5 +1,5 @@
+import { NetSocket } from "models";
 import { SocketServer } from "../server";
-import * as net from "net";
 
 // create an instance of the SocketServer class
 const server = new SocketServer();
@@ -8,7 +8,7 @@ const server = new SocketServer();
 const {emit:exampleResponseEmit} = server.EventEmitter<string>("example-response");
 
 // create an event handler
-server.Event<string>("example", (data: string, sender: net.Socket) => {  
+server.Event<string>("example", (data: string, sender: NetSocket) => {  
     console.log("\"example\" event handler >>>", data)
 
     // emit an event
