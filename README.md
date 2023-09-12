@@ -8,7 +8,7 @@ Install package socket-event
 # Server
 ## Create the socket server
 ```js
-import { SocketServer } from "../server/socker.server";
+import { SocketServer } from "socket-event/server";
 
 const server = new SocketServer();
  ```
@@ -29,7 +29,7 @@ server.Listen("localhost", 3001);
 # Client
 ## Create the socket client and set connected event
 ```js
-import { SocketClient } from "../client/socket.client";
+import { SocketClient } from "socket-event/client";
 
 const client = new SocketClient();
  ```
