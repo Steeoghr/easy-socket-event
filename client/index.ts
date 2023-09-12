@@ -1,8 +1,8 @@
-import * as net from 'net';
+import {Socket} from 'net';
 import { ISocketClient, SocketActor, SocketClientEmitter, SocketServerEvent, SocketClientEventEmitter } from '../models';
 
 export class SocketClient extends SocketActor implements ISocketClient {
-    private socket: net.Socket;
+    private socket: Socket;
 
     public connected: () => void = () => {};
     public onClose: () => void = () => {};
@@ -11,7 +11,7 @@ export class SocketClient extends SocketActor implements ISocketClient {
     
     constructor() {
         super();
-        this.socket = new net.Socket();
+        this.socket = new Socket();
     }
 
     public Connect(host: string, port: number) {
