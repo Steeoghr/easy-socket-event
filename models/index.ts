@@ -42,7 +42,6 @@ export type SocketServerEmitter<S extends string> = {
 
 export interface ISocketActor {
     Event<T>(name: string, handler: SocketServerEventHandlerDelegate<T>): SocketServerEventHandler<T>;
-    // defineEmit() TODO
 }
 
 export interface ISocketServer extends ISocketActor {
