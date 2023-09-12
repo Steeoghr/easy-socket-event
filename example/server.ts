@@ -1,4 +1,4 @@
-import { NetSocket } from "models";
+import { NetSocket } from "types";
 import { SocketServer } from "../server";
 
 // create an instance of the SocketServer class

@@ -1,4 +1,4 @@
-import { NetSocket } from "models";
+import { NetSocket } from "types";
 import { SocketClient } from "../client";
 
 // Create a new socket client
