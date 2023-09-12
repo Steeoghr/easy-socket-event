@@ -1,5 +1,5 @@
 {
-  "name": "e2ems",
+  "name": "easy-socket-event",
   "version": "1.0.0",
   "description": "e2ems",
   "types": "index.d.ts",
@@ -33,13 +33,13 @@
     "@types/ws": "^8.5.5",
     "typescript": "^5.1.3"
   },
-  "author": "Unknown",
+  "author": "Steeoghr",
   "license": "ISC",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Steeoghr/e2ems.git"
+    "url": "git+https://github.com/Steeoghr/socket-event.git"
   },
   "bugs": {
-    "url": "https://github.com/Steeoghr/e2ems/issues"
+    "url": "https://github.com/Steeoghr/socket-event/issues"
   }
 }
