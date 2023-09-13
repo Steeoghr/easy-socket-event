@@ -9,9 +9,9 @@ export class SocketServer extends SocketActor implements ISocketServer {
     public onError: (err: Error, socket: NetSocket) => void = () => {};
     public onEmit: <T>(event: SocketServerEvent<T>, socket: NetSocket) => void = <T>() => {};
 
-    constructor() {
+    constructor(server?: any) {
         super();
-        this.server = NetCreateServer();
+        this.server = server || NetCreateServer();
         this.server.on('connection', (socket: NetSocket) => {
             console.log('Client connected:', socket.remoteAddress, socket.remotePort);
             this.clientsConnected.push(socket);
