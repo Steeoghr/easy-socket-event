@@ -1,12 +1,13 @@
 import { Server, Socket, createServer } from 'net';
+import io from "socket.io";
 import { Dictionary } from 'utility/dictionary';
 
 // define the net socket and server types
 export class NetSocket extends Socket {
-    
+    constructor() { super(); }
 }
 export class NetServer extends Server {
-
+    constructor() { super(); }
 }
 
 // define the function to create a net server
