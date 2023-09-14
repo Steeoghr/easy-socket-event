@@ -42,7 +42,7 @@ export class SocketClient extends SocketActor implements ISocketClient {
             data
         };
 
-        this.socket.emit("message", JSON.stringify(event));
+        this.socket.emit("message", "ese-system", JSON.stringify(event));
         this.onEmit(event);
     }
 
