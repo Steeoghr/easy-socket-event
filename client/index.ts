@@ -7,7 +7,7 @@ export class SocketClient extends SocketActor implements ISocketClient {
     
     constructor(public socket: IoClientSocket, public connected: () => void) {
         super();
-        this.socket.on('connected', this.connected);
+        this.socket.on('connected', () => this.connected());
         this.socket.on('data', (message: string) => this.handleEvent(message));
         this.socket.on('close', this.handleClose);
         this.socket.on('error', (err) => this.handleError(err));
