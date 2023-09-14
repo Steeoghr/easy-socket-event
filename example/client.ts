@@ -1,8 +1,9 @@
-import { NetSocket } from "types";
+import { EventSocket } from "types";
 import { SocketClient } from "../client";
+import { createClient } from "../client/functions";
 
 // Create a new socket client
-const client = new SocketClient();
+const client = createClient("http://localhost");
 
 // Create a new event emitter for the "example" event
 const {emit:exampleEmit} = client.EventEmitter<string>("example");
@@ -15,9 +16,6 @@ client.connected = () => {
 };
 
 // Create a new event handler for the "example-response" event
-client.Event<string>("example-response", (data: string, sender: NetSocket) => {
+client.Event<string>("example-response", (data: string, sender: EventSocket) => {
     console.log("\"example-response\" client event handler >>>", data);
 });
-
-// Connect the client to the server
-client.Connect("localhost", 3001);

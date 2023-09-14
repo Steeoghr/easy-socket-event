@@ -1,22 +1,13 @@
-import { NetSocket, ISocketClient, SocketActor, SocketClientEmitter, SocketServerEvent, SocketClientEventEmitter } from '../types';
+import { ISocketClient, SocketActor, SocketClientEmitter, SocketServerEvent, SocketClientEventEmitter, IoSocket, IoClientSocket } from '../types';
 
 export class SocketClient extends SocketActor implements ISocketClient {
-    private socket: NetSocket;
-
     public connected: () => void = () => {};
     public onClose: () => void = () => {};
     public onError: (err: Error) => void = () => {};
     public onEmit: <T>(event: SocketServerEvent<T>) => void = <T>(event: SocketServerEvent<T>) => {};
     
-    constructor() {
+    constructor(public socket: IoClientSocket) {
         super();
-        this.socket = new NetSocket();
-    }
-
-    public Connect(host: string, port: number) {
-        this.socket.connect(port, host, () => {
-            this.connected();
-        });
 
         this.socket.on('data', (message: string) => this.handleEvent(message));
         this.socket.on('close', this.handleClose);
@@ -36,7 +27,7 @@ export class SocketClient extends SocketActor implements ISocketClient {
     };
 
     private handleClose() {
-        console.log('Client disconnected:', this.socket.remoteAddress, this.socket.remotePort);
+        console.log('Client disconnected');
         this.onClose();
     };
 
@@ -51,7 +42,7 @@ export class SocketClient extends SocketActor implements ISocketClient {
             data
         };
 
-        this.socket.write(JSON.stringify(event));
+        this.socket.emit("message", JSON.stringify(event));
         this.onEmit(event);
     }
 

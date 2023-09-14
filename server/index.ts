@@ -1,29 +1,29 @@
-import { NetSocket, NetServer, NetCreateServer, ISocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter } from '../types';
+import { IIoSocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter, IoSocket, IoServer, HttpServer } from '../types';
 
-export class SocketServer extends SocketActor implements ISocketServer {
-    private server: NetServer;
-    public clientsConnected: NetSocket[] = [];
+export class SocketServer extends SocketActor implements IIoSocketServer {
+    public clientsConnected: IoSocket[] = [];
 
-    public clientConnected: (socket: NetSocket) => void = () => {};
-    public onClose: (socket: NetSocket) => void = () => {};
-    public onError: (err: Error, socket: NetSocket) => void = () => {};
-    public onEmit: <T>(event: SocketServerEvent<T>, socket: NetSocket) => void = <T>() => {};
-
-    constructor(server?: any) {
+    clientConnected: (socket: IoSocket) => void = () => {};
+    onClose: (socket: IoSocket) => void = () => {};
+    onError: (err: Error, socket: IoSocket) => void = () => {};
+    onEmit: <T>(event: SocketServerEvent<T>, socket: IoSocket) => void = () => {};
+    constructor(private io: IoServer, private server: HttpServer) {
         super();
-        this.server = server || NetCreateServer();
-        this.server.on('connection', (socket: NetSocket) => {
-            console.log('Client connected:', socket.remoteAddress, socket.remotePort);
-            this.clientsConnected.push(socket);
+        this.io.on('connection', (socket) => {
             this.clientConnected(socket);
+            console.log('a user connected');
+            socket.on("message", (message) => {
+                this.clientsConnected.push(socket);
+                this.handleEvent(socket, message);
+            });
 
             socket.on('data', (message: string) => this.handleEvent(socket, message));
-            socket.on('close', () => this.handleClose(socket));
+            socket.on('disconnect', () => this.handleClose(socket));
             socket.on('error', (err) => this.handleError(err, socket));
         });
     }
 
-    private handleEvent<T>(socket: NetSocket, message: string) {
+    private handleEvent<T>(socket: IoSocket, message: string) {
         const messageEvent: SocketServerEvent<T> = JSON.parse(message);
         const registeredEvent = this.events[messageEvent.name];
 
@@ -34,17 +34,17 @@ export class SocketServer extends SocketActor implements ISocketServer {
         registeredEvent.handler(messageEvent.data, socket);
     };
 
-    private handleClose(socket: NetSocket) {
-        console.log('Client disconnected:', socket.remoteAddress, socket.remotePort);
+    private handleClose(socket: IoSocket) {
+        console.log('Client disconnected:', socket.conn.remoteAddress);
         this.onClose(socket);
     };
 
-    private handleError(err: Error, socket: NetSocket) {
+    private handleError(err: Error, socket: IoSocket) {
         console.error('Socket error:', err.message);
         this.onError(err, socket);
     };
 
-    protected emit<T>(eventName: string, data: T, socket: NetSocket) {
+    protected emit<T>(eventName: string, data: T, socket: IoSocket) {
         const event = {
             name: eventName,
             data
@@ -58,7 +58,7 @@ export class SocketServer extends SocketActor implements ISocketServer {
     public Emitter<S extends string>(...params: S[]): SocketServerEmitter<S> {
         const self = this;
         return <SocketServerEmitter<S>> {
-            emit: <T>(eventName: S, socket: NetSocket, data?: T) => {
+            emit: <T>(eventName: S, socket: IoSocket, data?: T) => {
                 self.emit(eventName, data, socket);
             }
         };
@@ -66,15 +66,16 @@ export class SocketServer extends SocketActor implements ISocketServer {
 
     public EventEmitter<T>(eventName: string): SocketServerEventEmitter<T> {
         return <SocketServerEventEmitter<T>> {
-            emit: <T>(socket: NetSocket, data?: T) => {
+            emit: <T>(socket: IoSocket, data?: T) => {
                 this.emit(eventName, data, socket);
             }
         };
     }
 
-    public Listen(host: string, port: number) {
-        this.server.listen(port, host, () => {
-          console.log(`Server listening on ${host}:${port}`);
+
+    public Listen(port: number) {
+        this.server.listen(port, () => {
+          console.log(`Server listening on ${port}`);
         });
     }
 }

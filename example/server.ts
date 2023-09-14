@@ -1,14 +1,14 @@
-import { NetSocket } from "types";
-import { SocketServer } from "../server";
+import { EventSocket } from "types";
+import { createServer } from "../server/functions";
 
 // create an instance of the SocketServer class
-const server = new SocketServer();
+const server = createServer();
 
 // create an event emitter
 const {emit:exampleResponseEmit} = server.EventEmitter<string>("example-response");
 
 // create an event handler
-server.Event<string>("example", (data: string, sender: NetSocket) => {  
+server.Event<string>("example", (data: string, sender: EventSocket) => {  
     console.log("\"example\" event handler >>>", data)
 
     // emit an event
@@ -16,4 +16,4 @@ server.Event<string>("example", (data: string, sender: NetSocket) => {
 });
 
 // start listening
-server.Listen("ws://prova-chat-server-ce604a0974e3.herokuapp.com", 3001);
+server.Listen(3000);
