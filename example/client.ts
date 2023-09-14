@@ -3,7 +3,7 @@ import { SocketClient } from "../client";
 import { createClient } from "../client/functions";
 
 // Create a new socket client
-const client = createClient("http://localhost");
+const client = createClient("ws://localhost:3000");
 
 // Create a new event emitter for the "example" event
 const {emit:exampleEmit} = client.EventEmitter<string>("example");
