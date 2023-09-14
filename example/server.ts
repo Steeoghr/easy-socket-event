@@ -16,4 +16,4 @@ server.Event<string>("example", (data: string, sender: NetSocket) => {
 });
 
 // start listening
-server.Listen("localhost", 3001);
+server.Listen("ws://prova-chat-server-ce604a0974e3.herokuapp.com", 3001);
