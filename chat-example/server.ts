@@ -1,24 +1,25 @@
-import { SocketServer } from "../server/socker.server";
+import { createServer } from "../server/functions";
 import { ConnectionInfo } from "./models/connection";
 import {ConnectionResponse} from "./models/connection-response";
 import { MessageSocketEvent } from "./models/message";
 import * as net from "net";
 import { NetUserInfo } from "./models/user";
+import { EventSocket } from "types";
 
-const server = new SocketServer();
+const server = createServer();
 
 const {emit:connectionResponseEmit} = server.EventEmitter<ConnectionResponse>("connection-response");
 const {emit:messageEmit} = server.EventEmitter<MessageSocketEvent>("message");
 
 interface NetUser extends NetUserInfo {
-    socket: net.Socket;
+    socket: EventSocket;
 }
 
 const usersConnected: NetUser[] = [];
 
 // Register the handler for connection event
 
-server.Event<ConnectionInfo>("connection", (data: ConnectionInfo, sender: net.Socket) => {  
+server.Event<ConnectionInfo>("connection", (data: ConnectionInfo, sender: EventSocket) => {  
     console.log("responseEmitter")
     const connectionMessage = data;
     const user = {
@@ -43,10 +44,10 @@ server.Event<ConnectionInfo>("connection", (data: ConnectionInfo, sender: net.So
 
 // Register the handler for message event
 
-server.Event<MessageSocketEvent>("message", (message: MessageSocketEvent, sender: net.Socket) => {
+server.Event<MessageSocketEvent>("message", (message: MessageSocketEvent, sender: EventSocket) => {
     const user = usersConnected.find(user => user.username === message.to);
     if (!user) {
-        sender.write(JSON.stringify({
+        sender.emit(JSON.stringify({
             from: "system",
             type: "message",
             message: "Unreachable user"
@@ -54,9 +55,10 @@ server.Event<MessageSocketEvent>("message", (message: MessageSocketEvent, sender
         return;
     }
 
-    console.log("Socket send message to user " + sender.remoteAddress)
+    console.log("Socket send message to user " + message.to)
 
     messageEmit(user.socket, message);
 });
 
-server.Listen("localhost", 3001);
+const port: any = process.env.PORT || 3001;
+server.Listen(port);

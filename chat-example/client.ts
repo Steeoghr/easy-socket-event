@@ -1,4 +1,4 @@
-import { SocketClient } from "../client/socket.client";
+import { createClient } from "../client/functions";
 import * as net from "net";
 // @ts-ignore
 import * as blessed from 'blessed';
@@ -9,6 +9,7 @@ import {ConnectionInfo} from "./models/connection";
 import {ConnectionResponse} from "./models/connection-response";
 import { NetUserInfo } from "./models/user";
 import { MessageSocketEvent } from "./models/message";
+import { EventSocket } from "types";
 
 // recupero delle chiavi pubblica e privata col metodo generteKeys
 const { privateKey, publicKey } = generateKeys();
@@ -24,19 +25,19 @@ readlineSync = undefined;
 
 let toUser: NetUserInfo | null = null;
 
-const client = new SocketClient();
+const host= "ws://prova-chat-server-ce604a0974e3.herokuapp.com";
+
+const client = createClient(host, () => {
+  // console.log("Client connected");
+  connectionEmit({
+      to,
+      username,
+      key: publicKey
+  });
+});
 
 const {emit:connectionEmit} = client.EventEmitter<ConnectionInfo>("connection");
 const {emit:messageEmit} = client.EventEmitter<MessageSocketEvent>("message");
-
-client.connected = () => {
-    // console.log("Client connected");
-    connectionEmit({
-        to,
-        username,
-        key: publicKey
-    });
-};
 
 // init blessed
 
@@ -131,7 +132,7 @@ let init = false;
 
 // export const testHandler = client.registerHandler<string>();
 
-client.Event<ConnectionResponse>("connection-response", (data: ConnectionResponse, sender: net.Socket) => {
+client.Event<ConnectionResponse>("connection-response", (data: ConnectionResponse, sender: EventSocket) => {
     // console.log("connection response event handler", data)
     
     if (!data.connected) {
@@ -154,7 +155,7 @@ client.Event<ConnectionResponse>("connection-response", (data: ConnectionRespons
 });
 
 
-client.Event("message", (message: MessageSocketEvent, sender: net.Socket) => {
+client.Event("message", (message: MessageSocketEvent, sender: EventSocket) => {
     if (!toUser) {
         toUser = { 
           username: message.from,
@@ -178,5 +179,3 @@ client.Event("message", (message: MessageSocketEvent, sender: net.Socket) => {
     inputBox.focus();
     screen.render();
 });
-
-client.Connect("localhost", 3001);
