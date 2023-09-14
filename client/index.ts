@@ -5,10 +5,9 @@ export class SocketClient extends SocketActor implements ISocketClient {
     public onError: (err: Error) => void = () => {};
     public onEmit: <T>(event: SocketServerEvent<T>) => void = <T>(event: SocketServerEvent<T>) => {};
     
-    constructor(public socket: IoClientSocket, public connected: () => void) {
+    constructor(public socket: IoClientSocket) {
         super();
-        this.socket.on('connected', () => this.connected());
-        this.socket.on('data', (message: string) => this.handleEvent(message));
+        this.socket.on('message', (message: string) => this.handleEvent(message));
         this.socket.on('close', this.handleClose);
         this.socket.on('error', (err) => this.handleError(err));
     }
@@ -41,7 +40,7 @@ export class SocketClient extends SocketActor implements ISocketClient {
             data
         };
 
-        this.socket.emit("message", "ese-system", JSON.stringify(event));
+        this.socket.emit("message", JSON.stringify(event));
         this.onEmit(event);
     }
 

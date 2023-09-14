@@ -4,5 +4,6 @@ import { IoClientSocket } from "types";
 
 export function createClient(host: string, connected: () => void) {
     const socket: IoClientSocket = io(host);
-    return new SocketClient(socket, connected);
+    socket.on('connected', () => connected());
+    return new SocketClient(socket);
 }

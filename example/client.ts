@@ -1,5 +1,4 @@
 import { EventSocket } from "types";
-import { SocketClient } from "../client";
 import { createClient } from "../client/functions";
 
 // Create a new socket client

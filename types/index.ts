@@ -104,7 +104,6 @@ export interface ISocketServer extends ISocketActor {
 export interface ISocketClient extends ISocketActor {
     Emitter<S extends string>(...params: S[]): SocketClientEmitter<S>;
     EventEmitter<T>(eventName: string): SocketClientEventEmitter<T>;
-    connected: () => void;
     onClose: () => void;
     onError: (err: Error) => void;
     onEmit: <T>(event: SocketServerEvent<T>) => void;
