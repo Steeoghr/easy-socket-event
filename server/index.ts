@@ -11,7 +11,7 @@ export class SocketServer extends SocketActor implements IIoSocketServer {
         super();
         this.io.on('connection', (socket) => {
             this.clientConnected(socket);
-            console.log('a user connected');
+            this.emit("connected", {}, socket);
             socket.on("message", (message) => {
                 this.clientsConnected.push(socket);
                 this.handleEvent(socket, message);
