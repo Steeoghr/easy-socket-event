@@ -6,8 +6,8 @@ import {createClient as _createClient} from './client/functions';
 export function createServer() {
     return _createServer();
 }
-export function createClient(host: string) {
-    return _createClient(host);
+export function createClient(host: string, connected: () => void) {
+    return _createClient(host, connected);
 }
 
 export {
