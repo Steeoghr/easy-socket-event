@@ -7,10 +7,10 @@ import { SocketServer } from "../server";
 
 export function createServer() {
     const app = express();
+    const server = http.createServer(app);
+    const io = new Server(server);
     app.get("/", (req: any, res: any) => {
         res.send("Server running...");
     })
-    const server = http.createServer(app);
-    const io = new Server(server);
     return new SocketServer(io, server);
 }
