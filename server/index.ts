@@ -11,19 +11,19 @@ export class SocketServer extends SocketActor implements IIoSocketServer {
         super();
         this.io.on('connection', (socket) => {
             this.clientConnected(socket);
-            this.emit("connected", {}, socket);
+            socket.emit("connected");
             socket.on("message", (message) => {
-                this.clientsConnected.push(socket);
                 this.handleEvent(socket, message);
             });
 
-            socket.on('data', (message: string) => this.handleEvent(socket, message));
+            socket.on('data', (...message: string[]) => this.handleEvent(socket, message[1]));
             socket.on('disconnect', () => this.handleClose(socket));
             socket.on('error', (err) => this.handleError(err, socket));
         });
     }
 
     private handleEvent<T>(socket: IoSocket, message: string) {
+        console.log("message", message)
         const messageEvent: SocketServerEvent<T> = JSON.parse(message);
         const registeredEvent = this.events[messageEvent.name];
 
@@ -65,9 +65,10 @@ export class SocketServer extends SocketActor implements IIoSocketServer {
     }
 
     public EventEmitter<T>(eventName: string): SocketServerEventEmitter<T> {
+        const self = this;
         return <SocketServerEventEmitter<T>> {
             emit: <T>(socket: IoSocket, data?: T) => {
-                this.emit(eventName, data, socket);
+                self.emit(eventName, data, socket);
             }
         };
     }
