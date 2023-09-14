@@ -1,22 +1,13 @@
-import { Server, Socket, createServer } from 'net';
+import { Server } from "http";
 import io from "socket.io";
+import {Socket as IoClientSocketClass} from "socket.io-client";
 import { Dictionary } from 'utility/dictionary';
 
-// define the net socket and server types
-export class NetSocket extends Socket {
-    constructor() { super(); }
-}
-export class NetServer extends Server {
-    constructor() { super(); }
-}
 
-// define the function to create a net server
-export function NetCreateServer(): NetServer {
-    return createServer();
-}
+export type EventSocket = IoSocket | IoClientSocket;
 
 // Define the type of the function to handle the event.
-export type SocketServerEventHandlerDelegate<T> = (data: T, sender: Socket) => void;
+export type SocketServerEventHandlerDelegate<T> = (data: T, sender: EventSocket) => void;
 
 // Define the type of the object that will hold the event name and the handler.
 export interface SocketServerEventHandler<T> {
@@ -45,13 +36,13 @@ export interface SocketClientEmitter<S extends string> {
 // Server Emitter types
 
 // Create a type alias for the emit method of server event emitter
-type SocketServerEventEmitterResultDelegate = <T>(socket: Socket, data?: T) => void;
+type SocketServerEventEmitterResultDelegate = <T>(socket: IoSocket, data?: T) => void;
 // Create a type alias for the emit method of server emitter
-type SocketServerEmitterResultDelegate<S extends string> = <T>(eventName: S, socket: Socket, data?: T) => void;
+type SocketServerEmitterResultDelegate<S extends string> = <T>(eventName: S, socket: EventSocket, data?: T) => void;
 
 // Define the type of the server event emitter
 export interface SocketServerEventEmitter<T> {
-    emit(socket: Socket, data?: T): SocketServerEventEmitterResultDelegate;
+    emit(socket: EventSocket, data?: T): SocketServerEventEmitterResultDelegate;
 }
 
 // Define the type of the server emitter
@@ -79,20 +70,38 @@ export abstract class SocketActor implements ISocketActor {
     }
 }
 
+export type IoSocket = io.Socket;
+
+export type IoServer = io.Server;
+
+export type HttpServer = Server;
+
+export type IoClientSocket = IoClientSocketClass;
+
+// Define the interface of socket server for socket.io
+export interface IIoSocketServer extends ISocketActor {
+    Listen(port: number): void;
+    Emitter<S extends string>(...params: S[]): SocketServerEmitter<S>;
+    EventEmitter<T>(eventName: string): SocketServerEventEmitter<T>;
+    clientConnected: (socket: IoSocket) => void;
+    onClose: (socket: IoSocket) => void;
+    onError: (err: Error, socket: IoSocket) => void;
+    onEmit: <T>(event: SocketServerEvent<T>, socket: IoSocket) => void;
+}
+
 // Define the interface of socket server
 export interface ISocketServer extends ISocketActor {
     Listen(host: string, port: number): void;
     Emitter<S extends string>(...params: S[]): SocketServerEmitter<S>;
     EventEmitter<T>(eventName: string): SocketServerEventEmitter<T>;
-    clientConnected: (socket: Socket) => void;
-    onClose: (socket: Socket) => void;
-    onError: (err: Error, socket: Socket) => void;
-    onEmit: <T>(event: SocketServerEvent<T>, socket: Socket) => void;
+    clientConnected: (socket: IoSocket) => void;
+    onClose: (socket: IoSocket) => void;
+    onError: (err: Error, socket: IoSocket) => void;
+    onEmit: <T>(event: SocketServerEvent<T>, socket: IoSocket) => void;
 }
 
 // Define the interface of socket client
 export interface ISocketClient extends ISocketActor {
-    Connect(host: string, port: number): void;
     Emitter<S extends string>(...params: S[]): SocketClientEmitter<S>;
     EventEmitter<T>(eventName: string): SocketClientEventEmitter<T>;
     connected: () => void;
