@@ -35,6 +35,7 @@ export class SocketServer extends SocketActor implements IIoSocketServer {
     };
 
     private handleClose(socket: IoSocket) {
+        this.clientsConnected = this.clientsConnected.filter(client => client.conn.remoteAddress !== socket.conn.remoteAddress);
         console.log('Client disconnected:', socket.conn.remoteAddress);
         this.onClose(socket);
     };
