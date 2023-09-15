@@ -10,6 +10,7 @@ export class SocketServer extends SocketActor implements IIoSocketServer {
     constructor(private io: IoServer, private server: HttpServer) {
         super();
         this.io.on('connection', (socket) => {
+            console.log('Client connected:', socket.id, socket.conn.remoteAddress);
             this.clientConnected(socket);
             socket.emit("connected");
             socket.on("message", (message) => {
