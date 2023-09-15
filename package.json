@@ -1,6 +1,6 @@
 {
   "name": "easy-socket-event",
-  "version": "1.0.25",
+  "version": "1.0.26",
   "description": "",
   "types": "index.d.ts",
   "main": "dist/index.js",
