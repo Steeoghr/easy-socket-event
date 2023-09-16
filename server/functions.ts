@@ -13,7 +13,8 @@ export function createServer() {
     // Configura EJS come motore di template
     app.set('view engine', 'ejs');
 // ../../../
-    const relPath = path.join(__dirname, '../../../../views');
+const views = '../../../../../views';
+    const relPath = path.join(__dirname, );
     console.log("relPath", relPath)
     // Specifica la cartella contenente i file HTML
     app.set('views', relPath);
@@ -21,7 +22,7 @@ export function createServer() {
     const server = http.createServer(app);
     const io = new Server(server);
     app.get("/", (req: any, res: any) => {
-        const _relPath = path.join(__dirname, '../../../../views');
+        const _relPath = path.join(__dirname, views);
         console.log("_relPath", _relPath)
         const templatePath = path.join(_relPath, 'index.html');
 
