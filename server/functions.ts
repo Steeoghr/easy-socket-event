@@ -13,13 +13,17 @@ export function createServer() {
     // Configura EJS come motore di template
     app.set('view engine', 'ejs');
 // ../../../
+    const relPath = path.join(__dirname, '../../../views');
+    console.log("relPath", relPath)
     // Specifica la cartella contenente i file HTML
-    app.set('views', path.join(__dirname, 'views'));
+    app.set('views', relPath);
 
     const server = http.createServer(app);
     const io = new Server(server);
     app.get("/", (req: any, res: any) => {
-        const templatePath = path.join(__dirname, 'views', 'index.html');
+        const _relPath = path.join(__dirname, '../../../views');
+        console.log("_relPath", _relPath)
+        const templatePath = path.join(_relPath, 'index.html');
 
         // Verifica se il file del template esiste
         if (fs.existsSync(templatePath)) {
