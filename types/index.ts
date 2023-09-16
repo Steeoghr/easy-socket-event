@@ -3,6 +3,7 @@ import io from "socket.io";
 import {Socket as IoClientSocketClass} from "socket.io-client";
 import { Dictionary } from 'utility/dictionary';
 
+export type ExpressApp = any; 
 
 export type EventSocket = IoSocket | IoClientSocket;
 
