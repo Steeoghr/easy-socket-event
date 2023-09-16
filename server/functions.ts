@@ -31,7 +31,7 @@ export function createServer() {
             res.render('index');
         } else {
             // Se il file non esiste, restituisci un messaggio personalizzato
-            res.send('Server running...');
+            res.send('Server running... ' + templatePath);
         }
     })
     return new SocketServer(io, server, app);
