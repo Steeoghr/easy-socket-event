@@ -1,28 +1,11 @@
 
 import {Server} from "socket.io";
-// @ts-ignore
-import express from "express";
 import http from "http";
 import { SocketServer } from "../server";
-import path from "path";
-import fs from "fs";
 
-export function createServer() {
-    const app = express();
+export function createServer(expressApp: any) {
 
-    // Configura EJS come motore di template
-    app.set('view engine', 'ejs');
-// ../../../
-const views = 'views';
-    const relPath = path.join(__dirname, views);
-    console.log("relPath", relPath)
-    // Specifica la cartella contenente i file HTML
-    app.set('views', views);
-
-    const server = http.createServer(app);
+    const server = http.createServer(expressApp);
     const io = new Server(server);
-    app.get("/", (req: any, res: any) => {
-        res.render('index');
-    })
-    return new SocketServer(io, server, app);
+    return new SocketServer(io, server, expressApp);
 }
