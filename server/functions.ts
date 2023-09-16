@@ -17,7 +17,7 @@ const views = '../views';
     const relPath = path.join(__dirname, views);
     console.log("relPath", relPath)
     // Specifica la cartella contenente i file HTML
-    app.set('views', relPath);
+    app.set('views', views);
 
     const server = http.createServer(app);
     const io = new Server(server);
