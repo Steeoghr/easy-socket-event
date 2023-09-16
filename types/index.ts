@@ -36,13 +36,13 @@ export interface SocketClientEmitter<S extends string> {
 // Server Emitter types
 
 // Create a type alias for the emit method of server event emitter
-export type SocketServerEventEmitterResultDelegate = <T>(socket: IoSocket, data?: T) => void;
+export type SocketServerEventEmitterResultDelegate<T> = (socket: IoSocket, data?: T) => void;
 // Create a type alias for the emit method of server emitter
 export type SocketServerEmitterResultDelegate<S extends string> = <T>(eventName: S, socket: EventSocket, data?: T) => void;
 
 // Define the type of the server event emitter
 export interface SocketServerEventEmitter<T> {
-    emit(socket: EventSocket, data?: T): SocketServerEventEmitterResultDelegate;
+    emit(socket: EventSocket, data?: T): SocketServerEventEmitterResultDelegate<T>;
 }
 
 // Define the type of the server emitter
