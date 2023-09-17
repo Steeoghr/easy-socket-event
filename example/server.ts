@@ -2,22 +2,14 @@ import { EventSocket } from "../types";
 import { createServer } from "../server/functions";
 // @ts-ignore
 import express from "express";
-import path from "path";
-import fs from "fs";
 
 const app = express();
 
 // Configura EJS come motore di template
-app.set('view engine', 'ejs');
-// ../../../
-const views = 'views';
-const relPath = path.join(__dirname, views);
-console.log("relPath", relPath)
 // Specifica la cartella contenente i file HTML
-app.set('views', relPath);
 
 app.get("/", (req: any, res: any) => {
-    res.render('index');
+    res.send('Server running');
 })
 
 // create an instance of the SocketServer class
