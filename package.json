@@ -1,6 +1,6 @@
 {
   "name": "easy-socket-event",
-  "version": "2.0.20",
+  "version": "2.0.21",
   "description": "",
   "types": "index.d.ts",
   "main": "dist/index.js",
@@ -9,8 +9,7 @@
     "start-server": "concurrently --kill-others \"npx tsc -w\" \"npx nodemon dist/example/server.js\"",
     "start-client": "node dist/example/client.js"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "typescript": "^5.1.6",
     "inquirer": "^9.2.10",
