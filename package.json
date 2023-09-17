@@ -15,7 +15,6 @@
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.11.0",
     "concurrently": "^8.2.0",
-    "crypto": "^1.0.1",
     "express": "^4.18.2",
     "fs": "^0.0.1-security",
     "inquirer": "^9.2.10",
@@ -30,6 +29,7 @@
     "typescript": "^5.1.6"
   },
   "devDependencies": {
+    "crypto": "^1.0.1",
     "@types/node": "^20.3.0",
     "@types/ws": "^8.5.5",
     "typescript": "^5.1.3"
