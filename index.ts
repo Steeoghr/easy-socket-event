@@ -12,7 +12,7 @@ export function createClient(host: string, connected: () => void) {
 }
 
 export {
-    SocketServer,
+    SocketServer,  
     SocketClient,
     EventSocket,
 }
