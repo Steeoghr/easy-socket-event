@@ -1,4 +1,4 @@
-import { IIoSocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter, IoSocket, IoServer, HttpServer } from '../types';
+import { IIoSocketServer, SocketActor, SocketServerEmitter, SocketServerEvent, SocketServerEventEmitter, IoSocket, IoServer, HttpServer, ExpressApp } from '../types';
 
 export class SocketServer extends SocketActor implements IIoSocketServer {
     public clientsConnected: IoSocket[] = [];
@@ -7,10 +7,11 @@ export class SocketServer extends SocketActor implements IIoSocketServer {
     onClose: (socket: IoSocket) => void = () => {};
     onError: (err: Error, socket: IoSocket) => void = () => {};
     onEmit: <T>(event: SocketServerEvent<T>, socket: IoSocket) => void = () => {};
-    constructor(private io: IoServer, private server: HttpServer) {
+    constructor(private io: IoServer, private server: HttpServer, private app: ExpressApp) {
         super();
         this.io.on('connection', (socket) => {
             console.log('Client connected:', socket.id, socket.conn.remoteAddress);
+            this.clientsConnected.push(socket);
             this.clientConnected(socket);
             socket.emit("connected");
             socket.on("message", (message) => {
@@ -80,5 +81,9 @@ export class SocketServer extends SocketActor implements IIoSocketServer {
         this.server.listen(port, () => {
           console.log(`Server listening on ${port}`);
         });
+    }
+
+    public getExpress() {
+        return this.app;
     }
 }

@@ -1,8 +1,19 @@
-import { EventSocket } from "types";
+import { EventSocket } from "../types";
 import { createServer } from "../server/functions";
+// @ts-ignore
+import express from "express";
+
+const app = express();
+
+// Configura EJS come motore di template
+// Specifica la cartella contenente i file HTML
+
+app.get("/", (req: any, res: any) => {
+    res.send('Server running');
+})
 
 // create an instance of the SocketServer class
-const server = createServer();
+const server = createServer(app);
 
 // create an event emitter
 const {emit:exampleResponseEmit} = server.EventEmitter<string>("example-response");
