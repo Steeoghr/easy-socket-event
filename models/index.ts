@@ -1,7 +1,7 @@
 import { Server } from "http";
 import io from "socket.io";
 import {Socket as IoClientSocketClass} from "socket.io-client";
-import { Dictionary } from 'utility/dictionary';
+import { Dictionary } from '../utility/dictionary';
 
 export type ExpressApp = any; 
 
