@@ -13,9 +13,9 @@ app.get("/", (req: any, res: any) => {
 })
 
 // create an instance of the SocketServer class
-const server = createServer(app);
+const server = createServer(app, "https://localhot:3000");
 
-// create an event emitter
+// create an event emitters
 const {emit:exampleResponseEmit} = server.EventEmitter<string>("example-response");
 
 // create an event handler
